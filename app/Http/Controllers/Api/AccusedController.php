@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use App\Models\AccusedServiceInfo;
 use App\Models\AccusedPresentAddInfo;
 use App\Models\AccusedPermanentAddInfo;

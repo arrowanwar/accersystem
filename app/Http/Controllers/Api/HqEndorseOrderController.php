@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use App\Models\HqEndorseOrder;
 use Illuminate\Http\Request;
 
 class HqEndorseOrderController extends Controller
 {
     public function index() {
-        return HqEndorseOrder::with('hqEr:id,hq_er_no')->paginate(20);
+        return HqEndorseOrder::paginate(20);
     }
 
     public function store(Request $request) {
@@ -18,6 +18,7 @@ class HqEndorseOrderController extends Controller
             'memo_no'  => ['required','string','max:255'],
             'date'     => ['required','date'],
         ]);
+
         $row = HqEndorseOrder::create($data);
         return response()->json($row, 201);
     }
@@ -32,6 +33,7 @@ class HqEndorseOrderController extends Controller
             'memo_no'  => ['sometimes','string','max:255'],
             'date'     => ['sometimes','date'],
         ]);
+
         $endorseOrder->update($data);
         return $endorseOrder;
     }
