@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Endorse Order</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 1050;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="card p-4 shadow">
+            <h2 class="card-title text-center mb-4">Create Endorse Order</h2>
+            <form id="endorseOrderForm" method="POST" action="/endorse-orders">
+                <div class="mb-3">
+                    <label for="hq_er_id" class="form-label">HQ ER ID</label>
+                    <input type="number" class="form-control" id="hq_er_id" name="hq_er_id" required>
+                    <div class="invalid-feedback" id="hq_er_id-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="memo_no" class="form-label">Memo No</label>
+                    <input type="text" class="form-control" id="memo_no" name="memo_no" required>
+                    <div class="invalid-feedback" id="memo_no-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="date" name="date" required>
+                    <div class="invalid-feedback" id="date-error"></div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container">
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Function to show a toast message
+            function showToast(message, type) {
+                const toastContainer = $('.toast-container');
+                const toastId = 'toast-' + Date.now();
+                const toastHtml = `
+                    <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+                toastContainer.append(toastHtml);
+                const toast = new bootstrap.Toast(document.getElementById(toastId));
+                toast.show();
+            }
+
+            $('#endorseOrderForm').on('submit', function(e) {
+                e.preventDefault();
+
+                // Clear previous validation errors
+                $('.is-invalid').removeClass('is-invalid');
+                $('.invalid-feedback').text('');
+
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: 'http://localhost:8000/api/endorse-orders', // Use the correct API route
+                    type: 'POST',
+                    data: formData,
+                    // Debug: log form data
+                    success: function(response) {
+                        showToast('Endorse order created successfully!', 'success');
+                        $('#endorseOrderForm')[0].reset();
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) { // Laravel validation error code
+                            const errors = xhr.responseJSON.errors;
+                            $.each(errors, function(key, value) {
+                                // Find the input and add the invalid class
+                                const input = $(`#${key}`);
+                                input.addClass('is-invalid');
+
+                                // Find the feedback element and set the error message
+                                const feedback = $(`#${key}-error`);
+                                feedback.text(value[0]);
+                            });
+                            showToast('Please correct the form errors.', 'danger');
+                        } else {
+                            showToast('An unexpected error occurred. Please try again.', 'danger');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

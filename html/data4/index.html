@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Office ER Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Field Office ER Entry Form</h4>
+        </div>
+        <div class="card-body">
+            <form id="foErForm">
+                
+                <div class="mb-3">
+                    <label class="form-label">HQ ER</label>
+                    <select class="form-select" name="hq_er_id" id="hq_er_no" required></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Enquiry Officer</label>
+                    <select class="form-select" name="enq_officer_id" id="enq_officer_id" required></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Endorsement HQ Order</label>
+                    <select class="form-select" name="endorsement_id" id="endorsement_id" required></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Accused Service</label>
+                    <select class="form-select" name="accused_service_info_id" id="accused_service_info_id" required></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Accused Present Address</label>
+                    <select class="form-select" name="accused_present_add_info_id" id="accused_present_add_info_id" required></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Accused Permanent Address</label>
+                    <select class="form-select" name="accused_permanent_add_info_id" id="accused_permanent_add_info_id" required></select>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Save Field Office ER</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="resultMessage" class="alert mt-3 d-none"></div>
+</div>
+
+<script>
+    const apiBase = "http://localhost:8000/api";
+
+    // Store HQ ERs to map ID to hq_er_no for submission
+    let hqErsData = [];
+
+    // Populate dropdowns
+    async function loadDropdowns() {
+        try {
+            // HQ ERs
+            let hqRes = await axios.get(`${apiBase}/hq-ers`);
+            hqErsData = hqRes.data.data;
+            let hqSelect = document.getElementById("hq_er_no");
+            hqErsData.forEach(item => {
+                hqSelect.innerHTML += `<option value="${item.id}">${item.hq_er_no}</option>`;
+            });
+
+            // Officers
+            let offRes = await axios.get(`${apiBase}/officers`);
+            let offSelect = document.getElementById("enq_officer_id");
+            offRes.data.data.forEach(item => {
+                offSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            });
+
+            // Endorsements
+            let endRes = await axios.get(`${apiBase}/endorse-orders`);
+            let endSelect = document.getElementById("endorsement_id");
+            endRes.data.data.forEach(item => {
+                endSelect.innerHTML += `<option value="${item.id}">${item.memo_no}</option>`;
+            });
+
+            // Accused Service Infos
+            let accSrvRes = await axios.get(`${apiBase}/accused/services`);
+            let accSrvSelect = document.getElementById("accused_service_info_id");
+            accSrvRes.data.data.forEach(item => {
+                accSrvSelect.innerHTML += `<option value="${item.id}">${item.name} (${item.post}, ${item.office_short_name})</option>`;
+            });
+
+            // Present Addresses
+            let presRes = await axios.get(`${apiBase}/accused/present`);
+            let presSelect = document.getElementById("accused_present_add_info_id");
+            presRes.data.data.forEach(item => {
+                presSelect.innerHTML += `<option value="${item.id}">${item.text}</option>`;
+            });
+
+            // Permanent Addresses
+            let permRes = await axios.get(`${apiBase}/accused/permanent`);
+            let permSelect = document.getElementById("accused_permanent_add_info_id");
+            permRes.data.data.forEach(item => {
+                permSelect.innerHTML += `<option value="${item.id}">${item.text}</option>`;
+            });
+
+        } catch (error) {
+            console.error("Error loading dropdowns:", error);
+            alert("Error loading dropdowns! Check console for details.");
+        }
+    }
+
+    // Submit form
+    document.getElementById("foErForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Get form data
+        let form = e.target;
+        let data = {
+            hq_er_no: document.getElementById('hq_er_no').options[document.getElementById('hq_er_no').selectedIndex].text,
+            enq_officer_id: form.enq_officer_id.value,
+            endorsement_id: form.endorsement_id.value,
+            accused_service_info_id: form.accused_service_info_id.value,
+            accused_present_add_info_id: form.accused_present_add_info_id.value,
+            accused_permanent_add_info_id: form.accused_permanent_add_info_id.value,
+        };
+
+        try {
+            let res = await axios.post(`${apiBase}/field-office-ers`, data);
+            showMessage("Field Office ER saved successfully!", "success");
+            form.reset();
+        } catch (err) {
+            console.error("Error saving record:", err.response?.data);
+            showMessage("Error saving record: " + JSON.stringify(err.response?.data.errors), "danger");
+        }
+    });
+
+    function showMessage(message, type) {
+        let resultDiv = document.getElementById("resultMessage");
+        resultDiv.className = `alert alert-${type}`;
+        resultDiv.textContent = message;
+        resultDiv.classList.remove("d-none");
+    }
+
+    // Load dropdown data on page load
+    loadDropdowns();
+</script>
+
+</body>
+</html>

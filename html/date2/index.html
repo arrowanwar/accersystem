@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Field Office ER</title>
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-light p-4">
+
+  <div class="container">
+    <h2 class="mb-4">Field Office ER Management</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFieldOfficeErModal">
+      + Add Field Office ER
+    </button>
+  </div>
+
+  <!-- Bootstrap Modal -->
+  <div class="modal fade" id="addFieldOfficeErModal" tabindex="-1" aria-labelledby="addFieldOfficeErModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        
+        <div class="modal-header">
+          <h5 class="modal-title">Add Field Office ER</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="fieldOfficeErForm">
+
+            <!-- HQ ER Dropdown -->
+            <div class="mb-3">
+              <label class="form-label">HQ ER</label>
+              <select class="form-select" name="hq_er_no" id="hqErDropdown" required>
+                <option value="">-- Select HQ ER --</option>
+              </select>
+            </div>
+
+            <!-- Officer Dropdown -->
+            <div class="mb-3">
+              <label class="form-label">Enquiry Officer</label>
+              <select class="form-select" name="enq_officer_id" id="officerDropdown" required>
+                <option value="">-- Select Officer --</option>
+              </select>
+            </div>
+
+            <!-- Endorsement Dropdown -->
+            <div class="mb-3">
+              <label class="form-label">Endorse Order</label>
+              <select class="form-select" name="endorsement_id" id="endorseDropdown" required>
+                <option value="">-- Select Endorse Order --</option>
+              </select>
+            </div>
+
+            <!-- Accused Service Info -->
+            <h6 class="mt-3">Accused Service Info</h6>
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="Name" name="service_name" required>
+              </div>
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="Post" name="service_post">
+              </div>
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="Office Short Name" name="service_office_short_name">
+              </div>
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="District" name="service_district">
+              </div>
+            </div>
+
+            <!-- Accused Present Address -->
+            <h6 class="mt-3">Accused Present Address</h6>
+            <div class="row">
+              <div class="col-md-12 mb-2">
+                <input type="text" class="form-control" placeholder="Full Address" name="present_text">
+              </div>
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="Thana" name="present_thana">
+              </div>
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="District" name="present_district">
+              </div>
+            </div>
+
+            <!-- Accused Permanent Address -->
+            <h6 class="mt-3">Accused Permanent Address</h6>
+            <div class="row">
+              <div class="col-md-12 mb-2">
+                <input type="text" class="form-control" placeholder="Full Address" name="permanent_text">
+              </div>
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="Thana" name="permanent_thana">
+              </div>
+              <div class="col-md-6 mb-2">
+                <input type="text" class="form-control" placeholder="District" name="permanent_district">
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="submitFieldOfficeEr()">Save</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+      // Load Officers
+      axios.get("http://127.0.0.1:8000/api/officers")
+        .then(res => {
+          let dropdown = document.getElementById("officerDropdown");
+          res.data.data.forEach(officer => {
+            let opt = document.createElement("option");
+            opt.value = officer.id;
+            opt.text = officer.name;
+            dropdown.appendChild(opt);
+          });
+        });
+
+      // Load HQ ERs
+      axios.get("http://127.0.0.1:8000/api/hq-ers")
+        .then(res => {
+          let dropdown = document.getElementById("hqErDropdown");
+          res.data.data.forEach(hqEr => {
+            let opt = document.createElement("option");
+            opt.value = hqEr.hq_er_no;
+            opt.text = hqEr.hq_er_no + " (" + hqEr.date + ")";
+            dropdown.appendChild(opt);
+          });
+        });
+
+      // Load Endorse Orders
+      axios.get("http://127.0.0.1:8000/api/endorse-orders")
+        .then(res => {
+          let dropdown = document.getElementById("endorseDropdown");
+          res.data.data.forEach(order => {
+            let opt = document.createElement("option");
+            opt.value = order.id;
+            opt.text = order.memo_no + " (" + order.date + ")";
+            dropdown.appendChild(opt);
+          });
+        });
+  });
+
+  async function submitFieldOfficeEr() {
+      let form = document.getElementById("fieldOfficeErForm");
+      let formData = new FormData(form);
+
+      try {
+          // Step 1: Insert Accused Service Info
+          let serviceRes = await axios.post("http://127.0.0.1:8000/api/accused/service", {
+              name: formData.get("service_name"),
+              post: formData.get("service_post"),
+              office_short_name: formData.get("service_office_short_name"),
+              district: formData.get("service_district"),
+          });
+
+          // Step 2: Insert Present Address
+          let presentRes = await axios.post("http://127.0.0.1:8000/api/accused/present", {
+              text: formData.get("present_text"),
+              thana: formData.get("present_thana"),
+              district: formData.get("present_district"),
+          });
+
+          // Step 3: Insert Permanent Address
+          let permanentRes = await axios.post("http://127.0.0.1:8000/api/accused/permanent", {
+              text: formData.get("permanent_text"),
+              thana: formData.get("permanent_thana"),
+              district: formData.get("permanent_district"),
+          });
+
+          // Step 4: Insert Field Office ER
+          await axios.post("http://127.0.0.1:8000/api/field-office-ers", {
+              hq_er_no: formData.get("hq_er_no"),
+              enq_officer_id: formData.get("enq_officer_id"),
+              endorsement_id: formData.get("endorsement_id"),
+              accused_service_info_id: serviceRes.data.id,
+              accused_present_add_info_id: presentRes.data.id,
+              accused_permanent_add_info_id: permanentRes.data.id,
+          });
+
+          alert("Data saved successfully!");
+          location.reload();
+
+      } catch (error) {
+          console.error(error);
+          alert("Error while saving data.");
+      }
+  }
+  </script>
+</body>
+</html>

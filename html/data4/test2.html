@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Office ER Data Input</title>
+</head>
+<body>
+    <h2>Add New Field Office ER</h2>
+    <form id="fieldOfficeErForm">
+        <label for="hq_er_id">HQ ER ID:</label><br>
+        <input type="text" id="hq_er_id" name="hq_er_id" required><br><br>
+
+        <label for="officer_id">Officer ID:</label><br>
+        <input type="text" id="officer_id" name="officer_id" required><br><br>
+
+        <label for="officer_endorsement_id">Officer Endorsement ID:</label><br>
+        <input type="text" id="officer_endorsement_id" name="officer_endorsement_id" required><br><br>
+
+        <label for="accused_service_info_id">Accused Service Info ID:</label><br>
+        <input type="text" id="accused_service_info_id" name="accused_service_info_id" required><br><br>
+
+        <label for="accused_present_add_info_id">Accused Present Address ID:</label><br>
+        <input type="text" id="accused_present_add_info_id" name="accused_present_add_info_id" required><br><br>
+
+        <label for="accused_permanent_add_info_id">Accused Permanent Address ID:</label><br>
+        <input type="text" id="accused_permanent_add_info_id" name="accused_permanent_add_info_id" required><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="responseMessage"></div>
+
+    <script>
+        document.getElementById('fieldOfficeErForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => (data[key] = value));
+
+            fetch('/api/field-office-ers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                const messageDiv = document.getElementById('responseMessage');
+                if (!response.ok) {
+                    messageDiv.textContent = `Error: ${response.status} - ${response.statusText}`;
+                    return response.json().then(errorData => {
+                        console.error('Validation Errors:', errorData.errors);
+                        messageDiv.textContent += `\n ${JSON.stringify(errorData.errors)}`;
+                    });
+                }
+                return response.json().then(responseData => {
+                    console.log('Success:', responseData);
+                    messageDiv.textContent = 'Data inserted successfully!';
+                    messageDiv.style.color = 'green';
+                });
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                document.getElementById('responseMessage').textContent = 'An error occurred. Check the console for details.';
+                document.getElementById('responseMessage').style.color = 'red';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Office ER Entry Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4>Create New Field Office ER</h4>
+            </div>
+            <div class="card-body">
+                <form id="fieldOfficeErForm">
+                    <div class="mb-3">
+                        <label for="hq_er_id" class="form-label">HQ ER</label>
+                        <select class="form-select" id="hq_er_id" name="hq_er_id" required>
+                            <option value="">Select HQ ER</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="officer_endorsement_id" class="form-label">Officer Endorsement</label>
+                        <select class="form-select" id="officer_endorsement_id" name="officer_endorsement_id" required>
+                            <option value="">Select Officer Endorsement</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="accused_service_info_id" class="form-label">Accused Service Info</label>
+                        <select class="form-select" id="accused_service_info_id" name="accused_service_info_id" required>
+                            <option value="">Select Accused Service Info</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="accused_present_add_info_id" class="form-label">Accused Present Address</label>
+                        <select class="form-select" id="accused_present_add_info_id" name="accused_present_add_info_id" required>
+                            <option value="">Select Accused Present Address</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="accused_permanent_add_info_id" class="form-label">Accused Permanent Address</label>
+                        <select class="form-select" id="accused_permanent_add_info_id" name="accused_permanent_add_info_id" required>
+                            <option value="">Select Accused Permanent Address</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="officer_id" class="form-label">Enquiry Officer</label>
+                        <select class="form-select" id="officer_id" name="officer_id" required>
+                            <option value="">Select Enquiry Officer</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Success!</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+                Data submitted successfully.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Your JavaScript code will go here
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('fieldOfficeErForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const toastElement = document.getElementById('liveToast');
+            const toastBody = document.getElementById('toastBody');
+            const toast = new bootstrap.Toast(toastElement);
+
+            const apiBaseUrl = 'http://127.0.0.1:8000/api'; // Replace with your actual API base URL
+
+            // Function to show a toast message
+            function showToast(message, isSuccess = true) {
+                if (isSuccess) {
+                    toastElement.classList.remove('text-bg-danger');
+                    toastElement.classList.add('text-bg-success');
+                    toastElement.querySelector('.toast-header').classList.remove('bg-danger');
+                    toastElement.querySelector('.toast-header').classList.add('bg-success');
+                    toastElement.querySelector('.me-auto').innerText = 'Success!';
+                } else {
+                    toastElement.classList.remove('text-bg-success');
+                    toastElement.classList.add('text-bg-danger');
+                    toastElement.querySelector('.toast-header').classList.remove('bg-success');
+                    toastElement.querySelector('.toast-header').classList.add('bg-danger');
+                    toastElement.querySelector('.me-auto').innerText = 'Error!';
+                }
+                toastBody.innerText = message;
+                toast.show();
+            }
+
+            // Function to fetch and populate dropdowns
+            async function fetchAndPopulateDropdown(url, selectId, valueKey, textKey) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    const select = document.getElementById(selectId);
+                    select.innerHTML = `<option value="">Select ${selectId.replace(/_/g, ' ')}</option>`;
+                    data.data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item[valueKey];
+                        option.textContent = item[textKey];
+                        select.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error(`Failed to fetch data for ${selectId}:`, error);
+                    showToast(`Failed to load data for ${selectId}.`, false);
+                }
+            }
+
+            // Fetch data for all dropdowns on page load
+            async function loadFormDependencies() {
+                await Promise.all([
+                    fetchAndPopulateDropdown(`${apiBaseUrl}/hq-ers`, 'hq_er_id', 'id', 'hq_er_no'),
+                    fetchAndPopulateDropdown(`${apiBaseUrl}/officer-endorsements`, 'officer_endorsement_id', 'id', 'memo_no'),
+                    fetchAndPopulateDropdown(`${apiBaseUrl}/accused-service-infos`, 'accused_service_info_id', 'id', 'name'),
+                    fetchAndPopulateDropdown(`${apiBaseUrl}/accused-present-add-infos`, 'accused_present_add_info_id', 'id', 'address'), // Assuming 'address' is a field
+                    fetchAndPopulateDropdown(`${apiBaseUrl}/accused-permanent-add-infos`, 'accused_permanent_add_info_id', 'id', 'address'), // Assuming 'address' is a field
+                    fetchAndPopulateDropdown(`${apiBaseUrl}/officers`, 'officer_id', 'id', 'name')
+                ]);
+            }
+
+            // Handle form submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Disable the button and show a loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                // Clear previous validation feedback
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                document.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+
+                try {
+                    const response = await fetch(`${apiBaseUrl}/field-office-ers`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showToast('Entry created successfully!');
+                        form.reset(); // Reset the form after successful submission
+                    } else if (response.status === 422) {
+                        // Validation errors
+                        showToast('Please correct the form errors.', false);
+                        for (const key in result.errors) {
+                            const input = document.querySelector(`[name="${key}"]`);
+                            if (input) {
+                                input.classList.add('is-invalid');
+                                const feedback = input.closest('.mb-3').querySelector('.invalid-feedback');
+                                if (feedback) {
+                                    feedback.innerText = result.errors[key][0];
+                                }
+                            }
+                        }
+                    } else {
+                        // Other server errors
+                        showToast(result.message || 'An error occurred.', false);
+                    }
+                } catch (error) {
+                    console.error('Submission failed:', error);
+                    showToast('Network error or server is unreachable.', false);
+                } finally {
+                    // Re-enable the button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit';
+                }
+            });
+
+            // Initial load of form data
+            loadFormDependencies();
+        });
+    </script>
+</body>
+
+</html>
