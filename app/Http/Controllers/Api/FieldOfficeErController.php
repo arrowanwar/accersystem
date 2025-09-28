@@ -11,9 +11,9 @@ class FieldOfficeErController extends Controller
     public function index() {
         return FieldOfficeEr::with([
             'hqEr:id,hq_er_no',
-            'enquiryOfficer:id,name',
-            'endorsement:id,hq_er_id,memo_no',
-            'accusedService:id,name,post,office_short_name',
+            'officer:id,name',
+            'officerEndorsement:id,officer_id,status',
+            'accusedServiceInfo:id,name,post,office_short_name',
         ])->paginate(20);
     }
 

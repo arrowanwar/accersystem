@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DataController;
 use App\Http\Controllers\Api\{
     HqErController,
     HqEndorseOrderController,
@@ -60,3 +61,5 @@ Route::get   ('/field-office-ers/{fieldOfficeEr}', [FieldOfficeErController::cla
 Route::put   ('/field-office-ers/{fieldOfficeEr}', [FieldOfficeErController::class, 'update']);
 Route::patch ('/field-office-ers/{fieldOfficeEr}', [FieldOfficeErController::class, 'update']);
 Route::delete('/field-office-ers/{fieldOfficeEr}', [FieldOfficeErController::class, 'destroy']);
+
+Route::get('/all-hq-er-data', [DataController::class, 'getAllData']);

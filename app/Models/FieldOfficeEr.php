@@ -24,12 +24,12 @@ class FieldOfficeEr extends Model
     return $this->belongsTo(HqEr::class, 'hq_er_id', 'id'); 
 }
 
-public function enquiryOfficer()
+public function officer()
 {
     return $this->belongsTo(Officer::class, 'officer_id'); 
 }
 
-public function endorsement()
+public function officerEndorsement()
 {
     return $this->belongsTo(OfficerEndorsement::class, 'officer_endorsement_id'); 
 }

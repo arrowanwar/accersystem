@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedTinyInteger('status')->default(0)->comment('0=pending,1=done');
             $table->timestamps();
             $table->softDeletes();
-
             $table->foreign('officer_id')->references('id')->on('officers')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('hq_endorse_order_id')->references('id')->on('hq_endorse_orders')->cascadeOnUpdate()->cascadeOnDelete();
             $table->index(['officer_id','hq_endorse_order_id']);
