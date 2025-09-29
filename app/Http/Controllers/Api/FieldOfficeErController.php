@@ -33,8 +33,8 @@ class FieldOfficeErController extends Controller
 
     public function show(FieldOfficeEr $fieldOfficeEr) {
         return $fieldOfficeEr->load([
-            'hqEr','enquiryOfficer','endorsement',
-            'accusedService','accusedPresentAddress','accusedPermanentAddress'
+            'hqEr','officer','officerEndorsement',
+            'accusedServiceInfo','accusedPresentAddInfo','accusedPermanentAddInfo'
         ]);
     }
 

@@ -39,12 +39,12 @@ public function accusedServiceInfo()
     return $this->belongsTo(AccusedServiceInfo::class, 'accused_service_info_id');
 }
 
-public function accusedPresentAddress()
+public function accusedPresentAddInfo()
 {
     return $this->belongsTo(AccusedPresentAddInfo::class, 'accused_present_add_info_id');
 }
 
-public function accusedPermanentAddress()
+public function accusedPermanentAddInfo()
 {
     return $this->belongsTo(AccusedPermanentAddInfo::class, 'accused_permanent_add_info_id');
 }
