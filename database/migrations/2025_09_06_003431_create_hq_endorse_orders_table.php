@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('hq_endorse_orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('hq_er_id');
-            $table->string('memo_no');
+            $table->string('memo_no')->default('')->index();
             $table->date('date')->index();
             $table->timestamps();
             $table->softDeletes();

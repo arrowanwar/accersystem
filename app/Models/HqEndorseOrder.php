@@ -13,7 +13,8 @@ class HqEndorseOrder extends Model
     protected $table = 'hq_endorse_orders';
 
     protected $fillable = [
-        'hq_er_id','memo_no','date',
+        'hq_er_id',
+        'memo_no','date',
     ];
 
     protected $casts = [ 'date' => 'date' ];

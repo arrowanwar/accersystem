@@ -36,7 +36,11 @@
       <form id="hqerForm">
         <div class="mb-3">
           <label class="form-label">HQ ER No</label>
-          <input type="text" class="form-control" name="hq_er_no" required>
+          <input type="text" class="form-control" name="hq_er_id" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Memo No</label>
+          <input type="text" class="form-control" name="memo_no" required>
         </div>
         <div class="mb-3">
           <label class="form-label">Date</label>
@@ -160,7 +164,7 @@
   }
 
   handleSubmit("officerForm", "/officers");
-  handleSubmit("hqerForm", "/hq-ers");
+  handleSubmit("hqerForm", "/endorse-orders");
   handleSubmit("accusedServiceForm", "/accused/service");
   handleSubmit("accusedPresentForm", "/accused/present");
   handleSubmit("accusedPermanentForm", "/accused/permanent");

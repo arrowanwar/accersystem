@@ -14,6 +14,7 @@ class HqEr extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'hq_ers';
+    protected $fillable = ['hq_er_id'];
 
     /**
      * Get the Endorse Orders associated with the HQ ER.
